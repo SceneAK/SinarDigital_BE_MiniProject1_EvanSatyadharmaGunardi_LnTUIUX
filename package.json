@@ -1,0 +1,28 @@
+{
+  "name": "fumogambling",
+  "version": "1.0.0",
+  "description": "gamble fumos",
+  "keywords": [
+    "gambling"
+  ],
+  "homepage": "https://github.com/SceneAK/SinarDigital_BE_MiniProject1_EvanSatyadharmaGunardi_LnTUIUX#readme",
+  "bugs": {
+    "url": "https://github.com/SceneAK/SinarDigital_BE_MiniProject1_EvanSatyadharmaGunardi_LnTUIUX/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SceneAK/SinarDigital_BE_MiniProject1_EvanSatyadharmaGunardi_LnTUIUX.git"
+  },
+  "license": "ISC",
+  "author": "kue (sceneak)",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "http": "^0.0.1-security"
+  }
+}

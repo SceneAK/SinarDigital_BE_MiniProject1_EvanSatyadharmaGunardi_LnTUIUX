@@ -1,3 +1,4 @@
+<!-- Gemini Decorated this -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,19 +6,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fumo Idler</title>
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9; /* Light, soft background */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- Coins Display --- */
+        #coins {
+            background-color: #ffeb3b; /* Bright yellow/gold for coins */
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            display: block; /* Ensures full width */
+            border: 2px solid #fbc02d;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: #4a6fa5; /* Blue heading */
+            border-bottom: 2px solid #4a6fa5;
+            padding-bottom: 5px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* --- Market and Owned Sections --- */
+        #market, #owned {
+            list-style: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #ffffff;
+            display: flex; /* Use flexbox for layout */
+            flex-wrap: wrap; /* Allows items to wrap */
+            gap: 20px; /* Space between items */
+        }
+
+        /* --- Individual Fumo Item Style --- */
+        .fumo-item {
+            width: 150px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .fumo-item:hover {
+            transform: translateY(-3px);
+            /* Removed box-shadow on hover */
+        }
+
+        .fumo-item img {
+            aspect-ratio: 1/1;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .fumo-item h4, .fumo-item h5 {
+            margin: 5px 0;
+        }
+
+        .fumo-item h4 {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .fumo-item h5 {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        /* --- Buy Button --- */
+        .fumo-item button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .fumo-item button:hover {
+            background-color: #1e7e34;
+        }
     </style>
 </head>
 <body>
-    <h1 id="coins" style="background-color: lightyellow; padding: 1%;">Coins: </h1>
+    <h1 id="coins">Coins: 0</h1>
 
-    <h2>Market</h2>
-    <ul style="border: 1px solid darkslategray; padding: 1%;" id="market">
-    </ul>
+    <h2>Market 🛍️</h2>
+    <ul id="market">
+        </ul>
 
-    <h2>Owned</h2>
-    <ul style="border: 1px solid darkslategray; padding: 1%;" id="owned">
-
-    </ul>
+    <h2>Owned Fumos 🧸</h2>
+    <ul id="owned">
+        </ul>
 
 
     <script type="module">
@@ -30,50 +120,85 @@
 
         window.takeOffer = async (offerId) =>
         {
-            await apiCall(`/market/${offerId}`, 'POST');
-            refreshMarket();
-            refreshFumos();
+            try {
+                await apiCall(`/market/${offerId}`, 'POST');
+                refreshMarket();
+                refreshFumos();
+                refreshCoins(); // Refresh coins immediately after purchase
+            } catch (error) {
+                console.error("Error taking offer:", error);
+                alert("Failed to buy Fumo! Check if you have enough coins.");
+            }
         }
 
-        const coins = document.getElementById('coins');
+        const coinsElement = document.getElementById('coins');
         async function refreshCoins() {
-            state.coins = (await apiCall('/collector/check', 'POST')).coins;
-            coins.innerText = "Coins: " + state.coins;
+            try {
+                const response = await apiCall('/collector/check', 'POST');
+                state.coins = response.coins;
+                // Format the coin value nicely (e.g., using toLocaleString)
+                coinsElement.innerText = "Coins: " + state.coins.toLocaleString();
+            } catch (error) {
+                console.error("Error refreshing coins:", error);
+            }
+            // Continue the refresh loop
             setTimeout(refreshCoins, 80);
         }
         refreshCoins();
 
         async function refreshFumos() {
-            const fumos = document.getElementById('owned');
-
-            state.fumos = await apiCall('/fumo', 'GET');
-            fumos.innerHTML = "";
-            for (const fumo of state.fumos) {
-                const div = document.createElement('div');
-                div.style = "width: 10%; display: inline-block; padding: 1%;";
-                div.innerHTML = `
-                    <img style="aspect-ratio: 1/1;" width="100%" src="${fumo.imgSrc || "https://placehold.co/150/FFB7B2/white?text=Mystery"}">
-                    <h5>${fumo.name} - lv ${fumo.level} (${fumo.msPerCoin/1000}s/coin)</h5>
-                `;
-                fumos.appendChild(div)
+            const ownedList = document.getElementById('owned');
+            try {
+                state.fumos = await apiCall('/fumo', 'GET');
+                ownedList.innerHTML = "";
+                for (const fumo of state.fumos) {
+                    const div = document.createElement('li');
+                    div.className = "fumo-item";
+                    
+                    // Convert msPerCoin to seconds/coin for display
+                    const secondsPerCoin = (fumo.msPerCoin / 1000).toFixed(1); 
+                    
+                    div.innerHTML = `
+                        <img src="${fumo.imgSrc || "https://placehold.co/150/9ad3e8/white?text=Mystery"}" alt="${fumo.name || 'Mystery Fumo'}">
+                        <h4>${fumo.name || "???"}</h4>
+                        <h5>Level ${fumo.level || 1}</h5>
+                        <p style="font-size: 0.8em; color: #4CAF50;">(${secondsPerCoin}s/coin)</p>
+                    `;
+                    ownedList.appendChild(div);
+                }
+            } catch (error) {
+                console.error("Error refreshing owned fumos:", error);
+                ownedList.innerHTML = `<li style="color: red;">Failed to load owned Fumos.</li>`;
             }
         }
         refreshFumos();
 
         async function refreshMarket() {
-            const market = document.getElementById('market');
+            const marketList = document.getElementById('market');
+            try {
+                const offers = await apiCall('/market', 'GET');
+                marketList.innerHTML = "";
+                for (const offer of offers) {
+                    const div = document.createElement('li');
+                    div.className = "fumo-item";
+                    
+                    // Use optional chaining for robustness
+                    const fumoName = offer.fumo?.name || "???";
+                    const fumoLevel = offer.fumo?.level || "?";
+                    const imgSrc = offer.fumo?.imgSrc || "https://placehold.co/150/FFB7B2/white?text=Mystery";
 
-            const offers = await apiCall('/market', 'GET');
-            market.innerHTML = "";
-            for (const offer of offers) {
-                const div = document.createElement('div');
-                div.style = "width: 10%; height: 10%; display: inline-block; padding: 1%;";
-                div.innerHTML = `
-                    <img style="aspect-ratio: 1/1;" width="100%" src="${offer.fumo?.imgSrc || "https://placehold.co/150/FFB7B2/white?text=Mystery"}">
-                    <h4>${offer.fumo?.name || "?"} - lv ${offer.fumo?.level || "?"}</h4>
-                    <h5>${offer.price} coins</h5> <button onclick="takeOffer(${offer.id})">Buy</button>
-                `;
-                market.appendChild(div)
+                    div.innerHTML = `
+                        <img src="${imgSrc}" alt="${fumoName}">
+                        <h4>${fumoName}</h4>
+                        <h5>Level ${fumoLevel}</h5>
+                        <h5>Price: ${offer.price.toLocaleString()} Coins</h5> 
+                        <button onclick="takeOffer(${offer.id})">Buy</button>
+                    `;
+                    marketList.appendChild(div);
+                }
+            } catch (error) {
+                console.error("Error refreshing market:", error);
+                marketList.innerHTML = `<li style="color: red;">Failed to load Market offers.</li>`;
             }
         }
         refreshMarket();

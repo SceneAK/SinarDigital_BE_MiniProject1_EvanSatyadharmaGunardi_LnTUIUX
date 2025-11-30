@@ -1,9 +1,12 @@
 import express from 'express'
 import session from 'express-session'
 import http from 'http'
+
+import marketRoute from './routes/marketRoute.js'
 import fumoRoute from './routes/fumoRoute.js'
 import collectorRoute from './routes/collectorRoute.js'
 import authRoute from './routes/authRoute.js'
+
 
 const app = express();
 
@@ -25,6 +28,7 @@ app.use(express.json());
 app.use('/auth', authRoute);
 app.use('/collector', collectorRoute);
 app.use('/fumo',  fumoRoute);
+app.use('/market',  marketRoute);
 
 // Let's go
 const PORT = 3000

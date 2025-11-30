@@ -5,7 +5,7 @@ class Common
         const idx = array.findIndex(match);
         if (idx == -1)
             throw new Error("Item not found");
-        array.splice(idx, 1);
+        return array.splice(idx, 1)[0];
     }
 
     static arrayGet(array, match) 

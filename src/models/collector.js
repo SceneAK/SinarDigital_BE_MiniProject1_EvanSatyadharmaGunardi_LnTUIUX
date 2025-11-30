@@ -5,11 +5,10 @@ var globalIdCount = 0;
 
 class Collector 
 {
-    constructor({coins, fumos, userId})
+    constructor({coins, userId})
     {
         this.userId = userId;
         this.coins = coins;
-        this.fumos = fumos;
     }
 
     clone()
@@ -17,21 +16,20 @@ class Collector
         return Object.assign(new Collector(this), this);
     }
 
-    prepareSerialize()
+    toPublicObj()
     {
-        delete this.id;
-        delete this.userId;
+        const { id, userId, ...data } = this;
+        return data;
     }
 
-    updateCoins()
+    addCoins(amount)
     {
-        for (const fumo in this.fumos)
-            this.coins += fumo.yieldCoins();
+        this.coins += amount;
     }
 
     static dbCreate(userId)
     {
-        var entry = new Collector({coins: 0, fumos: [], userId});
+        var entry = new Collector({coins: 0, userId});
         entry.id = globalIdCount++;
 
         collectorDb.push(entry);
@@ -45,13 +43,12 @@ class Collector
 
     static dbFetchByUserId(userId)
     {
-        console.log(JSON.stringify(collectorDb) + " trying to find " + userId);
         return Common.arrayGet(collectorDb, c => c.userId == userId).clone();
     }
 
-    static dbUpdate(id, data) 
+    static dbUpdate(updated) 
     {
-        Object.assign(Common.arrayGet(collectorDb, c => c.id == id), data);
+        Object.assign(Common.arrayGet(collectorDb, c => c.id == updated.id), updated);
     }
 
     static dbDelete(id)

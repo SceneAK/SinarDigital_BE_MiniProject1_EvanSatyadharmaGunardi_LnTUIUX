@@ -10,8 +10,7 @@ router.get('/', (req, res) => {
     try 
     {
         var user = User.dbFetchById(req.session.user.id);
-        user.prepareSerialize();
-        res.json(user)
+        res.json(user.toPublicObj())
     } catch(err) 
     {
         res.status(400).send(err.message);

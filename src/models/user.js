@@ -12,15 +12,10 @@ class User
         this.setPassword(password);
     }
 
-    clone()
+    toPublicObj()
     {
-        return Object.assign(new User(this), this);
-    }
-
-    prepareSerialize()
-    {
-        delete this.id;
-        delete this.password;
+        const { id, password, ...data } = this;
+        return data;
     }
 
     setName(name) 
@@ -62,17 +57,17 @@ class User
         entry.id = globalIdCount++;
 
         userDb.push(entry);
-        return entry.clone();
+        return entry;
     }
 
     static dbFetchByEmail(email)
     {
-        return Common.arrayGet(userDb, u => u.email == email).clone();
+        return Common.arrayGet(userDb, u => u.email == email);
     }
 
     static dbFetchById(id)
     {
-        return Common.arrayGet(userDb, u => u.id == id).clone();
+        return Common.arrayGet(userDb, u => u.id == id);
     }
 
     static dbDelete(id)

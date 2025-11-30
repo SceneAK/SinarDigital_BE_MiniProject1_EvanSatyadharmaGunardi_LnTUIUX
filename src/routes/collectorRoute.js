@@ -1,13 +1,16 @@
-import Collector from '../models/collector.js'
 import express from 'express'
+import Collector from '../models/collector.js'
+import { Fumo } from '../models/fumo.js'
 
 function checkCollector(userId)
 {
     let collector = Collector.dbFetchByUserId(userId);
-    collector.updateCoins();
-    Collector.dbUpdate(collector.id, collector);
-    collector.prepareSerialize();
-    return collector;
+
+    const fumos = Fumo.dbFetchByOwner(collector.id);
+    fumos.forEach( f => collector.addCoins(f.yieldCoins()));
+
+    Collector.dbUpdate(collector);
+    return collector.toPublicObj();
 }
 
 const router = express.Router();

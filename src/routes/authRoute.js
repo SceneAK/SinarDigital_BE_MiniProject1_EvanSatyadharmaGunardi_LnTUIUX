@@ -1,11 +1,14 @@
 import express from 'express'
-import User from '../models/user.js';
-import Collector from '../models/collector.js';
+import User from '../models/user.js'
+import Collector from '../models/collector.js'
+import { Fumo, ReimuFumo } from '../models/fumo.js'
 
 function signup(name, email, password)
 {
     const user = User.dbCreate(name, email, password);
-    const collector = Collector.dbCreate(0);
+    const collector = Collector.dbCreate(user.id);
+    const starterFumo = Fumo.dbInsert(collector.id, new ReimuFumo(1));
+
     return { user, collector };
 }
 

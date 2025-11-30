@@ -59,7 +59,6 @@ class ReimuFumo extends Fumo
               level);
 
         this.lastYieldMs = Date.now();
-        this.level       = level;
         this.msPerCoin   = 2000 - 1500*(this.level/10);
     }
 
@@ -85,11 +84,10 @@ class CirnoFumo extends Fumo
     {
         super("cirno_fumo", 
               "Cirno", 
-              "https://m.media-amazon.com/images/I/61CMzP-8YgL.jpg", 
+              "https://i.ebayimg.com/images/g/IEYAAOSwEAdkHBGW/s-l1200.jpg", 
               level);
 
-        this.lastYieldMs = Date.now(); // || data.lastYieldMs 
-        this.level       = level;
+        this.lastYieldMs = Date.now();
         this.coinBurst   = 9;
         this.msPerCoin   = 10000 - 9850*(this.level/10);
     }
@@ -106,6 +104,35 @@ class CirnoFumo extends Fumo
         this.lastYieldMs = Date.now() - delta % this.msPerCoin;
         return Math.floor(delta / this.msPerCoin) & this.coinBurst;
     }
+}
+
+class NeuroFumo extends Fumo
+{
+    constructor(level)
+    {
+        super("neuro_fumo", 
+              "Neuro", 
+              "https://cdn.shopify.com/s/files/1/0125/8261/7145/files/fEGtfMXVGaNb3e1To1TiWGgPIhsy6S3QhbpcYPPn2Yw_1000x.png.webp?v=1685035414",
+              level);
+
+        this.lastYieldMs = Date.now();
+        this.coinBurst   = 9;
+        this.msPerCoin   = 10000 - 9850*(this.level/10);
+    }
+
+    toPublicObj() 
+    {
+        const { lastYieldMs, ...rest } = super.toPublicObj();
+        return rest;
+    }
+
+    yieldCoins()
+    {
+        let delta = Date.now() - this.lastYieldMs;
+        this.lastYieldMs = Date.now() - delta % this.msPerCoin;
+        return Math.floor(delta / this.msPerCoin) & this.coinBurst;
+    }
+    
 }
 
 function createRandomFumo()

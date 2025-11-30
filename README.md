@@ -8,10 +8,10 @@ Gets currently owned fumos.
 - POST /collector/check
 Updates & retrieves the player (collector)'s coin balance
 
-- POST /signin
+- POST /auth/signin
 Requires JSON body "email", and "password", returns a session cookie.
 
-- POST /signup
+- POST /auth/signup
 Requires JSON body "name", "email", and "password", returns a session cookie.
 
 - GET /market

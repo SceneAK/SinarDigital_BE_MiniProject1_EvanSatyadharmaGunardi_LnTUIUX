@@ -5,15 +5,23 @@ import express from 'express'
 
 
 var priceMin = 1;
-var priceMax = 35;
+var priceMax = 30;
+
+restock();
+restock();
 restock();
 
-function restock(maxPrice)
+function restock()
 {
-    priceMin *= 1.2;
-    priceMax *= 1.2;
-    const price = priceMin + Math.floor(Math.random() * priceMax);
-    Offer.dbInsert(new Offer(createRandomFumo(), price));
+    priceMin *= 2;
+    priceMax *= 2;
+    const price = Math.floor(priceMin) + Math.floor(Math.random() * priceMax);
+    if (Math.random() < 0.6) {
+        Offer.dbInsert(new Offer(createRandomFumo(), price));
+    } else {
+        let fumo = createRandomFumo();
+        Offer.dbInsert(new MysteryOffer(fumo, price, Math.floor(fumo.level*3/10)));
+    }
 }
 
 function takeOffer(offerId, userId)

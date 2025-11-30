@@ -13,9 +13,8 @@ class Offer
     toPublicObj()
     {
         const { fumo, ...rest } = this;
-        const { name, level } = fumo;
 
-        const obj = { ...rest, fumo: { name, level } };
+        const obj = { ...rest, fumo: this.fumo.toPublicObj() };
         return obj;
     }
 

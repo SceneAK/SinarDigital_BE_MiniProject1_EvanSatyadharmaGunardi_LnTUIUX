@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fumo Idler</title>
+    <style>
+    </style>
+</head>
+<body>
+    <h1 id="coins" style="background-color: lightyellow; padding: 1%;">Coins: </h1>
+
+    <h2>Market</h2>
+    <ul style="border: 1px solid darkslategray; padding: 1%;" id="market">
+    </ul>
+
+    <h2>Owned</h2>
+    <ul style="border: 1px solid darkslategray; padding: 1%;" id="owned">
+
+    </ul>
+
+
+    <script type="module">
+        import { apiCall } from '/common.js';
+
+        const state = {
+            coins: 0,
+            fumos: []
+        };
+
+        window.takeOffer = async (offerId) =>
+        {
+            await apiCall(`/market/${offerId}`, 'POST');
+            refreshMarket();
+            refreshFumos();
+        }
+
+        const coins = document.getElementById('coins');
+        async function refreshCoins() {
+            state.coins = (await apiCall('/collector/check', 'POST')).coins;
+            coins.innerText = "Coins: " + state.coins;
+            setTimeout(refreshCoins, 80);
+        }
+        refreshCoins();
+
+        async function refreshFumos() {
+            const fumos = document.getElementById('owned');
+
+            state.fumos = await apiCall('/fumo', 'GET');
+            fumos.innerHTML = "";
+            for (const fumo of state.fumos) {
+                const div = document.createElement('div');
+                div.style = "width: 10%; display: inline-block; padding: 1%;";
+                div.innerHTML = `
+                    <img style="aspect-ratio: 1/1;" width="100%" src="${fumo.imgSrc || "https://placehold.co/150/FFB7B2/white?text=Mystery"}">
+                    <h5>${fumo.name} - lv ${fumo.level} (${fumo.msPerCoin/1000}s/coin)</h5>
+                `;
+                fumos.appendChild(div)
+            }
+        }
+        refreshFumos();
+
+        async function refreshMarket() {
+            const market = document.getElementById('market');
+
+            const offers = await apiCall('/market', 'GET');
+            market.innerHTML = "";
+            for (const offer of offers) {
+                const div = document.createElement('div');
+                div.style = "width: 10%; height: 10%; display: inline-block; padding: 1%;";
+                div.innerHTML = `
+                    <img style="aspect-ratio: 1/1;" width="100%" src="${offer.fumo?.imgSrc || "https://placehold.co/150/FFB7B2/white?text=Mystery"}">
+                    <h4>${offer.fumo?.name || "?"} - lv ${offer.fumo?.level || "?"}</h4>
+                    <h5>${offer.price} coins</h5> <button onclick="takeOffer(${offer.id})">Buy</button>
+                `;
+                market.appendChild(div)
+            }
+        }
+        refreshMarket();
+    </script>
+</body>
+</html>
